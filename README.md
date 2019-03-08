@@ -6,6 +6,8 @@ This API requires [NPM](https://www.npmjs.com/).
 
 Just type ```npm install``` to install the necessary dependencies
 
+Set the `GRADERPATH` option in the `.env` file to point to the grader build.
+
 ## Usage
 
 The API uses the SOLUTION node's to test against the test cases by default. If you need to test a student code, use the `-c` flag.
