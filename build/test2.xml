@@ -1,0 +1,406 @@
+<!-- Quest Q7 -->
+<TASK
+    coverimage="https://i.imgflip.com/2n6wnp.jpg"
+    duedate="2019-12-31T23:59+08"
+    kind="mission"
+    number="Q7"
+    startdate="2019-01-01T00:00+08"
+    title="Attack of the aliens!"
+    story=""
+>
+<READING>None</READING>
+<WEBSUMMARY></WEBSUMMARY>
+<TEXT>
+*This quest is a re-writing of Q7 of the CS1101S 2013 Midterms.*
+
+Oh no! A squad of hostile aliens has boarded the spaceship! Armed with weapons, they took everyone by surprise, forcing you and your bunkmates to retreat to a large training room.
+
+In a last-ditch effort, you remember that the training room has an attached armory with usable weapons. You hatch a plan to hack the electronic lock whilst your friends barricade the door.
+
+As the electronic lock beeps to indicate it is disabled, you hear the sounds of gunfire in the hallway...
+</TEXT>
+<PROBLEMS>
+    <PROBLEM maxgrade="4" maxxp="200" type="programming">
+        <TEXT>
+You hastily distribute the armaments amongst the team, until you realised you have never trained with such laser rifles before.
+
+To prevent crossfire, you decide to divide the room into an N-by-N grid. The N team members then spreads out across the room, with each member occupying one distinct square in the grid.
+
+To represent the row and column position of a team member, define a constructor `make_member` and accessor functions `row` and `column` that works as follows.
+
+**Do not break this abstraction for all subsequent tasks!**
+
+```
+const m = make_member(3, 4);
+const r = row(m);                       // returns 3
+const c = column(c);                    // returns 4
+```
+        </TEXT>
+        <SNIPPET>
+        <PREPEND>
+const row = head;
+const column = tail;
+        </PREPEND>
+        <TEMPLATE>
+function make_member(r, c) {
+    // Your answer here
+}
+        </TEMPLATE>
+        <SOLUTION>
+function make_member(r, c) {
+    return pair(r, c);
+}
+
+// 1 mark for use of pair or two-element array to represent the two coordinates
+// 1 mark for getter functions
+        </SOLUTION>
+        <POSTPEND></POSTPEND>
+        <TESTCASES>
+        <PUBLIC score="1" answer="3">row(make_member(3, 4));</PUBLIC>
+        <PUBLIC score="1" answer="4">column(make_member(3, 4));</PUBLIC>
+        <PRIVATE score="1" answer="5">row(make_member(5, 7));</PRIVATE>
+        <PRIVATE score="1" answer="7">column(make_member(5, 7));</PRIVATE>
+        </TESTCASES>
+    </SNIPPET>
+    </PROBLEM>
+    <PROBLEM maxgrade="6" maxxp="300" type="programming">
+        <TEXT>
+To prevent unwanted casualties, you decide it would be wise to ensure that no team member is in the line-of-sight of another team member's laser rifle.
+
+In order to plan your team formation, please first define a function `diagonal_line_of_sight` that returns `true` if a given team member `m2` is in the line-of-sight of the laser rifle of `m1`, and `false` otherwise.
+
+```
+const m1 = make_member(3, 4);
+const m2 = make_member(5, 6);
+const m3 = make_member(1, 3);
+diagonal_line_of_sight(m1, m2);         // returns true
+diagonal_line_of_sight(m1, m3);         // returns false
+```
+        </TEXT>
+        <SNIPPET>
+        <PREPEND>
+function make_member(r, c) {
+    return pair(r, c);
+}
+
+const row = head;
+const column = tail;
+        </PREPEND>
+        <TEMPLATE>
+function diagonal_line_of_sight(m1, m2) {
+    // Your answer here
+}
+        </TEMPLATE>
+        <SOLUTION>
+function diagonal_line_of_sight(m1, m2) {
+    const col_diff = math_abs(column(m1) - column(m2));
+    const row_diff = math_abs(row(m1) - row(m2));
+    return col_diff === row_diff;
+}
+
+// 1 mark each for computing absolute row and column differences
+// 1 mark for comparing absolute differences
+        </SOLUTION>
+        <POSTPEND>
+const m1 = make_member(3, 4);
+const m2 = make_member(5, 6);
+const m3 = make_member(1, 3);
+const m4 = make_member(6, 1);
+const m5 = make_member(2, 2);
+const m6 = make_member(2, 6);
+        </POSTPEND>
+        <TESTCASES>
+        <PUBLIC score="1" answer="true">diagonal_line_of_sight(m1, m2);</PUBLIC>
+        <PUBLIC score="1" answer="false">diagonal_line_of_sight(m1, m3);</PUBLIC>
+        <PRIVATE score="1" answer="true">diagonal_line_of_sight(m1, m4);</PRIVATE>
+        <PRIVATE score="1" answer="true">diagonal_line_of_sight(m3, m5);</PRIVATE>
+        <PRIVATE score="1" answer="false">diagonal_line_of_sight(m5, m2);</PRIVATE>
+        <PRIVATE score="1" answer="false">diagonal_line_of_sight(m5, m6);</PRIVATE>
+        </TESTCASES>
+    </SNIPPET>
+    </PROBLEM>
+    <PROBLEM maxgrade="8" maxxp="400" type="programming">
+        <TEXT>
+Now, define a function `diagonals_clear` that checks whether a given team member `m` is in the diagonal line-of-sight of a list of team members `ms`.
+
+The function should return `true` if *m does not share a common diagonal with any member in the list*.
+
+Hint: Use what you have already defined!
+
+Your earn an additional 2 marks if your solution uses the function `accumulate` in a meaningful way.
+
+```
+const m = make_member(4, 4);
+const m1 = make_member(5, 6);
+const m2 = make_member(4, 3);
+const m3 = make_member(6, 2);
+const ms1 = list(m1, m2);
+const ms2 = list(m1, m2, m3);
+diagonals_clear(m, ms1);            // returns true
+diagonals_clear(m, ms2);            // false; m and m4 share common diagonal
+```
+        </TEXT>
+        <SNIPPET>
+        <PREPEND>
+function make_member(r, c) {
+    return pair(r, c);
+}
+
+const row = head;
+const column = tail;
+        
+function diagonal_line_of_sight(m1, m2) {
+    const col_diff = math_abs(column(m1) - column(m2));
+    const row_diff = math_abs(row(m1) - row(m2));
+    return col_diff === row_diff;
+}
+        </PREPEND>
+        <TEMPLATE>
+function diagonals_clear(m, ms) {
+    // Your answer here
+}
+        </TEMPLATE>
+        <SOLUTION>
+function diagonals_clear(m, ms) {
+    return accumulate(
+        (oth_m, acc) => acc || diagonal_line_of_sight(m, oth_m),
+        true,
+        ms
+    );
+}
+
+// Award bonus 2 marks after autograding for correct use of accumulate
+        </SOLUTION>
+        <POSTPEND>
+const m = make_member(4, 4);
+const m1 = make_member(5, 6);
+const m2 = make_member(4, 3);
+const m3 = make_member(6, 2);
+const m4 = make_member(8, 1);
+const m5 = make_member(3, 5);
+const m6 = make_member(1, 2);
+const ms1 = list(m1, m2);
+const ms2 = list(m1, m2, m3);
+const ms3 = list();         // vacuously true
+const ms4 = list(m);
+const ms5 = list(m5, m2, m1);
+const ms6 = list(m1, m2, m4, m6);
+        </POSTPEND>
+        <TESTCASES>
+        <PUBLIC score="1" answer="true">diagonal_line_of_sight(m, ms1);</PUBLIC>
+        <PUBLIC score="1" answer="false">diagonal_line_of_sight(m, ms2);</PUBLIC>
+        <PRIVATE score="1" answer="true">diagonal_line_of_sight(m, ms3);</PRIVATE>
+        <PRIVATE score="1" answer="false">diagonal_line_of_sight(m, ms4);</PRIVATE>
+        <PRIVATE score="1" answer="false">diagonal_line_of_sight(m, ms5);</PRIVATE>
+        <PRIVATE score="1" answer="true">diagonal_line_of_sight(m, ms6);</PRIVATE>
+        </TESTCASES>
+    </SNIPPET>
+    </PROBLEM>
+    <PROBLEM maxgrade="8" maxxp="400" type="programming">
+        <TEXT>
+Your team hastily disperses into a random formation in the room (remember each member occupies a distinct square in the grid).
+
+You would like to evaluate the viability of a given formation on the grid.
+
+Using the function `diagonals_clear` from the previous task, define a new function `mutually_clear_diagonals` that returns `true` if no two members in the list share a common diagonal line-of-sight, and `false` otherwise.
+
+```
+const m1 = make_member(5, 6);
+const m2 = make_member(4, 3);
+const m3 = make_member(6, 2);
+const m4 = make_member(4, 4);
+const ms1 = list(m1, m2, m4);
+const ms2 = list(m1, m2, m3);
+mutually_clear_diagonals(ms1);      // returns true
+mutually_clear_diagonals(ms2);      // false; m3 and m4 share common diagonal
+```
+        </TEXT>
+        <SNIPPET>
+        <PREPEND>
+        function make_member(r, c) {
+            // Your answer here
+        }          
+        </PREPEND>
+        <TEMPLATE>
+function mutually_clear_diagonals(ms) {
+    // Your answer here
+}
+        </TEMPLATE>
+        <SOLUTION>
+function mutually_clear_diagonals(ms) {
+    return is_empty_list(ms)
+        ? true
+        : diagonals_clear(head(ms), tail(ms)) || mutually_clear_diagonals(tail(ms));
+}
+
+// 1 mark for correct base case
+// 2 marks for correct recursive case
+        </SOLUTION>
+        <POSTPEND>
+const m1 = make_member(5, 6);
+const m2 = make_member(4, 3);
+const m3 = make_member(6, 2);
+const m4 = make_member(4, 4);
+const m5 = make_member(8, 1);
+const m6 = make_member(3, 1);
+const m7 = make_member(1, 4);
+const m8 = make_member(7, 7);
+const ms1 = list(m1, m2, m4);
+const ms2 = list(m1, m2, m3);
+const ms3 = list();         // vacuously true
+const ms4 = list(m1);
+const ms5 = list(m5, m2, m1);
+const ms6 = list(m3, m4, m5, m8);
+const ms7 = list(m2, m4, m6, m8);
+const ms8 = list(m1, m2, m3, m5, m6, m7, m8);
+        </POSTPEND>
+        <TESTCASES>
+        <PUBLIC score="1" answer="true">mutually_clear_diagonals(ms1)</PUBLIC>
+        <PUBLIC score="1" answer="false">mutually_clear_diagonals(ms2)</PUBLIC>
+        <PRIVATE score="1" answer="true">mutually_clear_diagonals(ms3)</PRIVATE>
+        <PRIVATE score="1" answer="true">mutually_clear_diagonals(ms4)</PRIVATE>
+        <PRIVATE score="1" answer="true">mutually_clear_diagonals(ms5)</PRIVATE>
+        <PRIVATE score="1" answer="false">mutually_clear_diagonals(ms6)</PRIVATE>
+        <PRIVATE score="1" answer="false">mutually_clear_diagonals(ms7)</PRIVATE>
+        <PRIVATE score="1" answer="true">mutually_clear_diagonals(ms8)</PRIVATE>
+        </TESTCASES>
+    </SNIPPET>
+    </PROBLEM>
+    <PROBLEM maxgrade="8" maxxp="500" type="programming">
+        <TEXT>
+You decide a random formation is too risky and runs the risk of a team member accidentally hitting another with a shot from his laser rifle. Instead, you opt to methodically generate all possible ways to place one team member in each distinct row and distinct column on the N x N grid.
+
+Your strategy begins with producing the list of all permutations of the numbers from 1 to N. For a particular permutation *p*, generate a possible formation by placing one member in each column. The row for the *i*-th team member is indicated by the *i*-th element of *p*.
+
+Since at most one member is positioned in a column, there will not be any vertical line-of-sight conflicts. As no two numbers appear twice in a permutation, there will not be any horizontal line-of-sight conflicts.
+
+You are given the function `permutations(xs)` that returns a list of all possible permutations of the elements in a list `xs`, and the function `zip(xs, ys, f)` that returns a list with the binary function `f(x, y)` applied to corresponding pairs of elements in `xs` and `ys`.
+
+Define a function `formations` that produces all formations with one team member in each column of the grid and in different rows on the N x N grid. The function should return a list of valid formations, each itself a list of members.
+
+```
+formations(1);  // returns list(list(make_member(1, 1)));
+formations(2);
+//  returns list(
+//      list(make_member(1, 1), make_member(2, 2)),
+//      list(make_member(1, 2), make_member(2, 1))
+//  )
+```
+        </TEXT>
+        <SNIPPET>
+        <PREPEND>
+function permutations(s) {
+    if (is_empty_list(s)) {
+        return list([]);
+    } else {
+        return accumulate(append, [],
+            map(
+                x => map(
+                    p => pair(x, p),
+                    permutations(remove(x, s))
+                ),
+                s
+            )
+        );
+    }
+}
+
+function zip(xs, ys, f) {
+    if (is_empty_list(xs) || is_empty_list(ys)) {
+        return [];
+    } else {
+        return pair(
+            f(head(xs), head(ys)),
+            zip(tail(xs), tail(ys), f));
+    }
+}
+        </PREPEND>
+        <TEMPLATE>
+function formations(n) {
+    // Your answer here
+}
+        </TEMPLATE>
+        <SOLUTION>
+function formations(n) {
+    const ref_list = enum_list(1, n);
+    const perms = permutations(ref_list);
+    return map(p => zip(make_member, ref_list, p), perms);
+}
+
+// Award bonus 1 mark after autograding for correct use of filter
+        </SOLUTION>
+        <POSTPEND>
+const __ = n => map(p => zip(make_member, enum_list(1, n), p), permutations(enum_list(1, n)));
+        </POSTPEND>
+        <TESTCASES>
+        <PUBLIC score="1" answer="true">equals(formations(1), __(1))</PUBLIC>
+        <PRIVATE score="1" answer="true">equals(formations(2), __(2))</PRIVATE>
+        <PRIVATE score="1" answer="true">equals(formations(4), __(4))</PRIVATE>
+        <PRIVATE score="2" answer="true">equals(formations(6), __(6))</PRIVATE>
+        <PRIVATE score="2" answer="true">equals(formations(8), __(8))</PRIVATE>
+        </TESTCASES>
+    </SNIPPET>
+    </PROBLEM>
+    <PROBLEM maxgrade="6" maxxp="300" type="programming">
+        <TEXT>
+Complete your battle plan by defining the function `safe_formations` that produces all possible safe formations for a N-by-N grid for N team members.
+
+Your function should do this by generating all possible formations on the N-by-N grid using the `formations` function defined previously, then using a filter to only retain formations where no two team members share a common diagonal line-of-sight.
+
+You earn an additional 1 mark if your solution uses the `filter` function in a meaningful way.
+
+Best of luck! Hopefully your battle strategy allows you to fend off the invaders.
+
+```
+valid_formations(3);    // returns an empty list (no valid solutions for 3x3 grid)
+```
+        </TEXT>
+        <SNIPPET>
+        <PREPEND></PREPEND>
+        <TEMPLATE>
+function safe_formations(n) {
+    // Your answer here
+}
+        </TEMPLATE>
+        <SOLUTION>
+function safe_formations(n) {
+    return filter(
+        fmn => mutually_clear_diagonals(fmn),
+        formations(n)
+    );
+}
+
+// Award bonus 1 mark after autograding for correct use of filter
+        </SOLUTION>
+        <POSTPEND>
+const __ = n => filter(fmn => mutually_clear_diagonals(fmn), formations(n));
+        </POSTPEND>
+        <TESTCASES>
+        <PUBLIC score="1" answer="true">equals(safe_formations(3), list())</PUBLIC>
+        <PRIVATE score="1" answer="true">equals(safe_formations(2), __(2))</PRIVATE>
+        <PRIVATE score="1" answer="true">equals(safe_formations(4), __(4))</PRIVATE>
+        <PRIVATE score="1" answer="true">equals(safe_formations(7), __(7))</PRIVATE>
+        <PRIVATE score="2" answer="true">equals(safe_formations(8), __(8))</PRIVATE>
+        </TESTCASES>
+    </SNIPPET>
+    </PROBLEM>
+</PROBLEMS>
+<TEXT>
+## Submission
+
+Submit your mission on the Source Academy.
+
+Make sure that your work is done and saved on the left hand side and not in the REPL on the right! Only your programs on the left will be used to assess your solution.
+</TEXT>
+<DEPLOYMENT interpreter="4"></DEPLOYMENT>
+    <EXTERNAL name="none">
+        <SYMBOL>permutations</SYMBOL>
+        <SYMBOL>zip</SYMBOL>
+    </EXTERNAL>
+<GRADERDEPLOYMENT interpreter="4">
+    <EXTERNAL name="none">
+        <SYMBOL>permutations</SYMBOL>
+        <SYMBOL>zip</SYMBOL>
+    </EXTERNAL>
+</GRADERDEPLOYMENT>
+</TASK>
