@@ -2,6 +2,8 @@
 
 ## Installation and Requirements
 
+Install this repo into the same folder containing the grader repo.
+
 This API requires [NPM](https://www.npmjs.com/).
 
 Just type ```npm install``` to install the necessary dependencies
