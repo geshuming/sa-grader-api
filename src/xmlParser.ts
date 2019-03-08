@@ -33,7 +33,7 @@ export const makeEntireAssessment = (result: any) : [IAssessmentOverview, IAsses
 }
 
 const makeAssessmentOverview = (result: any, maxGradeVal: number, maxXpVal: number) : IAssessmentOverview => {
-  const task : IXmlParseStrTask = result.CONTENT.TASK[0];
+  const task : IXmlParseStrTask = result.TASK;
   const rawOverview : IXmlParseStrOverview = task.$;
   return {
     category: capitalizeFirstLetter(rawOverview.kind) as AssessmentCategories,
@@ -54,7 +54,7 @@ const makeAssessmentOverview = (result: any, maxGradeVal: number, maxXpVal: numb
 }
 
 const makeAssessment = (result: any) : [IAssessment, number, number] => {
-  const task : IXmlParseStrTask = result.CONTENT.TASK[0];
+  const task : IXmlParseStrTask = result.TASK;
   const rawOverview : IXmlParseStrOverview = task.$;
   const questionArr = makeQuestions(task);
   return [
@@ -155,106 +155,13 @@ const makeMCQ = (problem: IXmlParseStrCProblem, question: IQuestion) : IMCQQuest
 const makeProgramming = (problem: IXmlParseStrPProblem, question: IQuestion): IProgrammingQuestion => {
   const result: IProgrammingQuestion = {
     ...question,
-    answer: problem.SNIPPET[0].TEMPLATE[0] as string,
+    prepend: problem.SNIPPET[0].PREPEND[0] as string,
+    template: problem.SNIPPET[0].TEMPLATE[0] as string,
+    postpend: problem.SNIPPET[0].POSTPEND[0] as string,
     solutionTemplate: problem.SNIPPET[0].SOLUTION[0] as string,
+    testcases: problem.SNIPPET[0].TESTCASES[0],
     type: "programming"
-  }
-  if (problem.SNIPPET[0].GRADER){
-    result.graderTemplate = problem.SNIPPET[0].GRADER[0];
   }
   return result;
 }
 
-export const assessmentToXml = (assessment: IAssessment, overview: IAssessmentOverview): IXmlParseStrTask => {
-  const task: any = {};
-  const rawOverview : IXmlParseStrOverview = {
-    kind: overview.category.toLowerCase(),
-    duedate: overview.closeAt,
-    coverimage: overview.coverImage,
-    startdate: overview.openAt,
-    title: overview.title,
-    story: overview.story
-  };
-  task.$ = rawOverview;
-
-  task.WEBSUMMARY = overview.shortSummary;
-  task.TEXT = assessment.longSummary;
-  task.PROBLEMS = {PROBLEM: []};
-
-  const library : Library = assessment.questions[0].library;
-  const deployment = {
-    $: {
-      interpreter: library.chapter.toString()
-    },
-    EXTERNAL: {
-      $: {
-        name: library.external.name,
-      }
-    }
-  }
-
-  if (library.external.symbols.length !== 0){
-    /* tslint:disable:no-string-literal */
-    deployment.EXTERNAL["SYMBOL"] = library.external.symbols;
-  }
-  if (library.globals.length !== 0){
-    /* tslint:disable:no-string-literal */
-    deployment["GLOBAL"] = library.globals.map(
-      (x) => {
-        return {
-          IDENTIFIER: x[0],
-          VALUE: x[2]
-        }
-      }
-    );
-  }
-
-  task.DEPLOYMENT = deployment;
-  if (assessment.graderDeployment){
-    task.GRADERDEPLOYMENT = assessment.graderDeployment;
-  }
-
-  assessment.questions.forEach((question: IProgrammingQuestion | IMCQQuestion) => {
-    const problem = {
-      $: {
-        type: question.type,
-        maxgrade: question.maxGrade
-      },
-      SNIPPET: {
-        SOLUTION: question.answer
-      },
-      TEXT: question.content,
-      CHOICE: [] as any[],
-    }
-
-    if (question.maxXp){
-      /* tslint:disable:no-string-literal */
-      problem.$["maxxp"] = question.maxXp;
-    }
-
-    if (question.type === 'programming') {
-      problem.SNIPPET.SOLUTION = question.solutionTemplate;
-      if (question.graderTemplate){
-        /* tslint:disable:no-string-literal */
-        problem.SNIPPET["GRADER"] = question.graderTemplate;
-      }
-      /* tslint:disable:no-string-literal */
-      problem.SNIPPET["TEMPLATE"] = question.answer;
-    }
-
-    if (question.type === 'mcq') {
-      question.choices.forEach((choice: MCQChoice, i: number) => {
-        problem.CHOICE.push({
-          $: {
-            correct: (question.solution === i) ? 'true' : 'false',
-          },
-          TEXT: choice.content,
-        })
-      })
-    }
-
-    task.PROBLEMS.PROBLEM.push(problem);
-  });
-
-  return task;
-}

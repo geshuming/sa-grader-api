@@ -49,13 +49,29 @@ import {
   
   export interface IXmlParseStrPProblem extends IXmlParseStrProblem {
     SNIPPET: Array<{
+      PREPEND: string[],
       TEMPLATE: string[],
       SOLUTION: string[],
-      GRADER: string[]
+      POSTPEND: string[],
+      TESTCASES: Array<{
+        PUBLIC: Array<{
+          score: number,
+          answer: string
+        }>
+        PRITVATE: Array<{
+          score: number,
+          answer: string
+        }>
+      }>
     }>,
     TEXT: string[]
   }
   
+  export interface IXmlParseStrPProblemTestcases {
+    score: number
+    answer: string
+  }
+
   export interface IXmlParseStrCProblem extends IXmlParseStrProblem {
     CHOICE: IXmlParseStrProblemChoice[],
     SNIPPET: {
