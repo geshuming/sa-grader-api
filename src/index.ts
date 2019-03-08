@@ -1,32 +1,50 @@
+#! /usr/bin/env node
+
 import { parseString } from 'xml2js'
 import { makeEntireAssessment } from './xmlParser'
 import * as fs from 'fs'
 import { IProgrammingQuestion } from './assessmentShape';
+import * as program from 'commander'
 
+require('dotenv').config()
 
-if (process.argv.length !== 3) {
-    console.error('Exactly two arguments required');
-    process.exit(1);
+program
+    .usage('[options] <xmlfile>')
+    .arguments('<file>')
+    .option('-t, --task <n>', 'the task number to be tested')
+    .option('-c, --code <file>', 'the student code to be tested')
+    .parse(process.argv)
+
+if (!program.args[0]) {
+    console.error('Error: Missing XML File!')
+    process.exit(1)
 }
 
-const assessmentXML = process.argv[2];
+const assessmentXML = program.args[0];
 
 var assessment
 parseString(fs.readFileSync(assessmentXML, 'utf8'), (err, result) => {
     if (err) throw err
     console.log('Successfully parsed XML')
-    //console.log(JSON.stringify(result, null, " "))
+    // console.log(JSON.stringify(result, null, " "))
     assessment = makeEntireAssessment(result)
 })
 
 var questions: Array<IProgrammingQuestion> = assessment[1].questions
+
+if (program.task) {
+    questions = [questions[program.task - 1]]
+}
 
 questions = questions.filter((question) => question["type"] === "programming")
 
 function assess(question) {
     const prepend = question.prepend!
     // const studentcode = fs.readFileSync(studentProg, 'utf8') as string
-    const solution = question.solutionTemplate
+    var solution
+    if (program.code) solution = fs.readFileSync(program.code, 'utf8')
+    else solution = question.solutionTemplate
+    // console.log(solution)
     const postpend = question.postpend!
     var testcases = question.testcases.PUBLIC.map(function (arr) {
         return {
@@ -59,7 +77,7 @@ function assess(question) {
     // console.log("Payload: \n" + JSON.stringify(event, null, " "))
     return lambdaLocal.execute({
         event: event,
-        lambdaPath: '../grader/build/',
+        lambdaPath: process.env.GRADERPATH,
         lambdaHandler: 'handler',
         environment: {
             TIMEOUT: 3000
@@ -80,7 +98,7 @@ function assess(question) {
 var results: Promise<any>[] = questions.map(question => assess(question))
 Promise.all(results).then(result => 
 {
-    var taskno = 1
+    var taskno = program.task ? program.task : 1
     result.forEach(function(result) {
             console.log("--------------------- TASK " + taskno + " ---------------------")
             taskno ++

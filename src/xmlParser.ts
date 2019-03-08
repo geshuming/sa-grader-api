@@ -73,7 +73,7 @@ const makeAssessment = (result: any) : [IAssessment, number, number] => {
 }
 
 const altEval = (str: string) : any => {
-    return str;
+  return Function('"use strict";return (' + str + ')')();
 }
 
 const makeLibrary = (deployment: IXmlParseStrDeployment) : Library => {
